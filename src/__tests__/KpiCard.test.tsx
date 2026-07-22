@@ -13,11 +13,11 @@ describe("KpiCard", () => {
 
   it("uses success styling for positive change", () => {
     render(<KpiCard {...baseProps} change={0.94} />);
-    expect(screen.getByTestId("metric-badge")).toHaveClass("bg-accent-green-soft");
+    expect(screen.getByTestId("metric-badge")).toHaveClass("text-emerald-700");
   });
 
   it("uses danger styling for negative change", () => {
     render(<KpiCard {...baseProps} change={-1.2} />);
-    expect(screen.getByTestId("metric-badge")).toHaveClass("bg-accent-red-soft");
+    expect(screen.getByTestId("metric-badge")).toHaveClass("text-red-700");
   });
 });

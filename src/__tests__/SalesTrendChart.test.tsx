@@ -19,7 +19,7 @@ describe("SalesTrendChart", () => {
     render(<SalesTrendChart />);
 
     expect(screen.getByTestId("sales-chart")).toHaveAttribute("data-range", "monthly");
-    expect(screen.getByTestId("recharts-data")).toHaveAttribute("data-length", "12");
+    expect(screen.getByTestId("recharts-data")).toHaveAttribute("data-length", "48");
 
     await user.click(screen.getByRole("button", { name: "Weekly" }));
     expect(screen.getByTestId("sales-chart")).toHaveAttribute("data-range", "weekly");

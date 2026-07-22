@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --sidebar-width: 16.25rem;
-  --header-height: 4rem;
-  --container-max-width: 87.5rem;
+  --sidebar-width: 17.5rem;
+  --header-height: 5rem;
+  --container-max-width: 120rem;
   --card-padding: 1.5rem;
-  --card-radius: 0.75rem;
-  --input-radius: 0.5rem;
+  --card-radius: 0.875rem;
+  --input-radius: 0.625rem;
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -16,34 +16,38 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
 
-  --background: #f8f9fa;
+  --background: #ffffff;
+  --dashboard-background: #ffffff;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-border: #e4e4e7;
-  --surface-soft: #f4f4f5;
-  --text-main: #18181b;
-  --text-muted: #71717a;
-  --text-subtle: #a1a1aa;
-  --primary: #18181b;
+  --surface-border: #deddd9;
+  --surface-soft: #f2f1ee;
+  --surface-sidebar: #f5f4f1;
+  --text-main: #171717;
+  --text-muted: #7b7b78;
+  --text-subtle: #a5a5a1;
+  --primary: #171717;
   --primary-foreground: #ffffff;
   --accent-green: #10b981;
   --accent-green-soft: #ecfdf5;
   --accent-red: #ef4444;
   --accent-red-soft: #fef2f2;
-  --chart-new: #18181b;
-  --chart-existing: #d4d4d8;
+  --chart-existing: #171717;
+  --chart-new: #d8d8d5;
 
-  --shadow-border: 0 0 0 1px rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06), 0 2px 4px rgb(0 0 0 / 0.04);
-  --shadow-border-hover: 0 0 0 1px rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08), 0 4px 10px rgb(0 0 0 / 0.06);
+  --shadow-border: 0 0 0 1px rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.05), 0 2px 5px rgb(0 0 0 / 0.035);
+  --shadow-border-hover: 0 0 0 1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.07), 0 5px 14px rgb(0 0 0 / 0.055);
   --shadow-popover: 0 0 0 1px rgb(0 0 0 / 0.08), 0 10px 32px -8px rgb(0 0 0 / 0.18);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-dashboard-background: var(--dashboard-background);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-surface-border: var(--surface-border);
   --color-surface-soft: var(--surface-soft);
+  --color-surface-sidebar: var(--surface-sidebar);
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
