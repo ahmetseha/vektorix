@@ -1,0 +1,6 @@
+import { Card } from "@/components/ui/card";
+import { SettingsForm } from "@/components/settings/settings-form";
+
+export default function SettingsPage() {
+  return <div className="space-y-6"><div><p className="text-xs font-medium uppercase tracking-[0.08em] text-text-muted">Workspace</p><h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em]">Settings</h1><p className="mt-2 text-sm text-text-muted">Configure your workspace preferences and notifications.</p></div><div className="grid gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]"><nav className="space-y-1"><a href="#general" className="block min-h-10 rounded-input bg-primary px-3 py-2.5 text-sm font-medium text-white">General</a><a href="#notifications" className="block min-h-10 rounded-input px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-surface-soft">Notifications</a><a href="#data" className="block min-h-10 rounded-input px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-surface-soft">Data & privacy</a></nav><Card id="general" className="p-card"><h2 className="text-lg font-semibold">General settings</h2><p className="mt-1 mb-6 text-sm text-text-muted">Update how your workspace appears across Vektorix.</p><SettingsForm /></Card></div></div>;
+}
