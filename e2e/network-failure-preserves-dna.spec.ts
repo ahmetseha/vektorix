@@ -5,6 +5,7 @@ test("network-failure-preserves-dna", async ({ page }) => {
   await page.goto("/lab");
   await page.getByRole("button", { name: "Go to Name" }).click();
   await page.getByRole("textbox", { name: "Name" }).fill("Offline Signal");
-  await page.getByRole("button", { name: "Publish Vektor" }).click();
+  await page.getByRole("button", { name: "Choose destination" }).click();
+  await page.getByRole("button", { name: "Release into the Field" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "The field could not reach storage" })).toContainText("DNA is safe on this device");
 });

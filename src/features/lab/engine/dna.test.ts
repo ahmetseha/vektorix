@@ -13,7 +13,9 @@ describe("deterministic organism engine", () => {
   ]);
 
   it("returns identical DNA for identical inputs", () => {
-    expect(createDNA({ seed: "ion-moth", archetype: "electric", gesture })).toEqual(createDNA({ seed: "ion-moth", archetype: "electric", gesture }));
+    expect(createDNA({ seed: "ion-moth", archetype: "electric", gesture })).toEqual(
+      createDNA({ seed: "ion-moth", archetype: "electric", gesture }),
+    );
   });
 
   it("round trips DNA without loss", () => {
@@ -24,7 +26,7 @@ describe("deterministic organism engine", () => {
   it("keeps mutation bounded and deterministic", () => {
     const parent = createDNA({ seed: "parent", gesture });
     expect(mutateDNA(parent, "child")).toEqual(mutateDNA(parent, "child"));
-    expect(mutateDNA(parent, "child").motion.turbulence).toBeGreaterThanOrEqual(0);
+    expect(mutateDNA(parent, "child").visual.motion.turbulence).toBeGreaterThanOrEqual(0);
   });
 
   it("fuses the same parents reproducibly", () => {
@@ -34,6 +36,15 @@ describe("deterministic organism engine", () => {
   });
 
   it("selects conservative quality for reduced motion", () => {
-    expect(selectQuality({ width: 1200, height: 800, dpr: 2, cores: 12, memory: 16, reducedMotion: true })).toBe("low");
+    expect(
+      selectQuality({
+        width: 1200,
+        height: 800,
+        dpr: 2,
+        cores: 12,
+        memory: 16,
+        reducedMotion: true,
+      }),
+    ).toBe("low");
   });
 });

@@ -10,4 +10,11 @@ test("mobile-flow-remains-operable", async ({ page }) => {
   expect(box?.width).toBeGreaterThanOrEqual(44);
   await page.getByRole("button", { name: "Go to Charge" }).click();
   await expect(page.getByRole("button", { name: /Charged/ })).toBeVisible();
+  await page.getByRole("button", { name: "Go to Name" }).click();
+  await page.getByRole("textbox", { name: "Name" }).fill("Mobile Signal");
+  await page.getByRole("button", { name: "Choose destination" }).click();
+  await page.getByRole("button", { name: /Void Garden/ }).click();
+  await page.getByRole("button", { name: "Release into the Field" }).click();
+  await expect(page).toHaveURL(/\/field\/void-garden\?slug=mobile-signal/);
+  await expect(page.getByText(/^Energy/)).toBeVisible();
 });

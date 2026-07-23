@@ -4,19 +4,34 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { decodeDNA } from "@/features/lab/engine/dna";
 import { getSampleVektor } from "@/features/vektors/samples";
 import { VektorDetail } from "@/features/vektors/VektorDetail";
-import type { VektorRecord } from "@/features/vektors/types";
+import { createEphemeralVektorRecord } from "@/features/vektors/create-ephemeral-record";
 import { vektorRepository } from "@/server/services/vektor-repository";
 
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ data?: string; name?: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ data?: string; name?: string }>;
+};
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params;
   const query = await searchParams;
   const record = vektorRepository.get(slug) ?? getSampleVektor(slug);
-  const name = query.name ? decodeURIComponent(query.name) : record?.name ?? "Unknown Vektor";
-  const description = record?.description ?? "A living deterministic organism shaped in the Vektorix lab.";
+  const name = query.name ? decodeURIComponent(query.name) : (record?.name ?? "Unknown Vektor");
+  const description =
+    record?.description ?? "A living deterministic organism shaped in the Vektorix lab.";
   const socialImage = `/v/${slug}/opengraph-image`;
-  return { title: name, description, alternates: { canonical: `/v/${slug}` }, openGraph: { title: `${name} — Vektorix`, description, type: "website", images: [socialImage] }, twitter: { card: "summary_large_image", title: `${name} — Vektorix`, description, images: [socialImage] } };
+  return {
+    title: name,
+    description,
+    alternates: { canonical: `/v/${slug}` },
+    openGraph: { title: `${name} — Vektorix`, description, type: "website", images: [socialImage] },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} — Vektorix`,
+      description,
+      images: [socialImage],
+    },
+  };
 }
 
 export default async function VektorPage({ params, searchParams }: Props) {
@@ -26,9 +41,20 @@ export default async function VektorPage({ params, searchParams }: Props) {
   if (!record && query.data) {
     try {
       const dna = decodeDNA(query.data);
-      record = { id: slug, slug, name: query.name ? decodeURIComponent(query.name) : "Shared Vektor", description: "A deterministic signal shared from the Vektorix field.", creator: "Anonymous researcher", dna, createdAt: new Date().toISOString(), reactionCount: 0, remixCount: 0, generation: dna.ancestry?.generation ?? 1 } satisfies VektorRecord;
-    } catch { notFound(); }
+      record = createEphemeralVektorRecord({
+        slug,
+        name: query.name ? decodeURIComponent(query.name) : "Shared Vektor",
+        dna,
+      });
+    } catch {
+      notFound();
+    }
   }
   if (!record) notFound();
-  return <><SiteHeader /><VektorDetail initialRecord={record} /></>;
+  return (
+    <>
+      <SiteHeader />
+      <VektorDetail initialRecord={record} />
+    </>
+  );
 }

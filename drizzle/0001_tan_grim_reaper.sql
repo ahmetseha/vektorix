@@ -1,0 +1,1 @@
+ALTER TABLE "vektors" ALTER COLUMN "dna_version" SET DEFAULT 2;

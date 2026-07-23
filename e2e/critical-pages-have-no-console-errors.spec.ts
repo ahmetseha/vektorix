@@ -4,7 +4,7 @@ test("critical-pages-have-no-console-errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
-  for (const path of ["/", "/lab", "/explore", "/v/pale-signal"]) {
+  for (const path of ["/", "/lab", "/explore", "/v/pale-signal", "/field/silent-ocean?slug=pale-signal", "/v/pale-signal/memories"]) {
     await page.goto(path);
     await expect(page.locator("main")).toBeVisible();
   }

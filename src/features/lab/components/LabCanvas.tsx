@@ -9,10 +9,39 @@ import type { VektorDNA } from "../schemas/dna";
 import { createInfluence, type InfluenceState } from "../engine/influence";
 import { qualityConfig, selectQuality, type QualityTier } from "../engine/quality";
 import { Organism } from "./Organism";
+import {
+  BiomeEnvironment,
+  NearbySignalSilhouettes,
+} from "@/features/field/components/BiomeEnvironment";
+import type { BiomeType } from "@/features/simulation/schemas/biome";
+import type { VektorState } from "@/features/simulation/schemas/state";
+import { getBiomeDefinition } from "@/features/simulation/registries/biomes";
 
 export type AudioBands = { bass: number; mid: number; treble: number };
 
-export function LabCanvas({ dna, paused = false, interactive = true, audioBands, keyboardInput, onContextLost }: { dna: VektorDNA; paused?: boolean; interactive?: boolean; audioBands?: React.RefObject<AudioBands>; keyboardInput?: React.RefObject<{ x: number; y: number; feed: boolean }>; onContextLost?: () => void }) {
+export type LabCanvasProps = {
+  dna: VektorDNA;
+  paused?: boolean;
+  interactive?: boolean;
+  audioBands?: React.RefObject<AudioBands>;
+  keyboardInput?: React.RefObject<{ x: number; y: number; feed: boolean }>;
+  onContextLost?: () => void;
+  biome?: BiomeType;
+  lifeState?: VektorState;
+  showNearby?: boolean;
+};
+
+export function LabCanvas({
+  dna,
+  paused = false,
+  interactive = true,
+  audioBands,
+  keyboardInput,
+  onContextLost,
+  biome,
+  lifeState,
+  showNearby = false,
+}: LabCanvasProps) {
   const [visible, setVisible] = useState(true);
   const [supported, setSupported] = useState(true);
   const [quality, setQuality] = useState<QualityTier>("medium");
@@ -23,7 +52,16 @@ export function LabCanvas({ dna, paused = false, interactive = true, audioBands,
     setSupported(Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl")));
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-    setQuality(selectQuality({ memory, cores: navigator.hardwareConcurrency, width: window.innerWidth, height: window.innerHeight, dpr: window.devicePixelRatio, reducedMotion: media.matches }));
+    setQuality(
+      selectQuality({
+        memory,
+        cores: navigator.hardwareConcurrency,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        dpr: window.devicePixelRatio,
+        reducedMotion: media.matches,
+      }),
+    );
     const onVisibility = () => setVisible(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
@@ -34,34 +72,96 @@ export function LabCanvas({ dna, paused = false, interactive = true, audioBands,
 
   return (
     <Canvas
-      aria-label={`Living ${dna.archetype} Vektor. Move a pointer or use arrow keys to disturb its particle field.`}
-      camera={{ position: [0, 0, typeof window !== "undefined" && window.innerWidth < 700 ? 9 : 7.2], fov: 44, near: 0.1, far: 80 }}
+      aria-label={`Living ${dna.visual.archetype} Vektor${biome ? ` in the ${getBiomeDefinition(biome).name}` : ""}. Move a pointer or use arrow keys to disturb its particle field.`}
+      camera={{
+        position: [0, 0, typeof window !== "undefined" && window.innerWidth < 700 ? 9 : 7.2],
+        fov: 44,
+        near: 0.1,
+        far: 80,
+      }}
       dpr={config.dpr}
       frameloop={visible && !paused ? "always" : "demand"}
-      gl={{ antialias: quality !== "low", alpha: false, powerPreference: "high-performance", preserveDrawingBuffer: true }}
+      gl={{
+        antialias: quality !== "low",
+        alpha: false,
+        powerPreference: "high-performance",
+        preserveDrawingBuffer: true,
+      }}
       onCreated={({ gl }) => {
-        gl.setClearColor(dna.palette.background);
+        gl.setClearColor(
+          biome ? getBiomeDefinition(biome).visualTheme.background : dna.visual.palette.background,
+        );
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.05;
-        gl.domElement.addEventListener("webglcontextlost", (event) => { event.preventDefault(); onContextLost?.(); }, { once: true });
+        gl.domElement.addEventListener(
+          "webglcontextlost",
+          (event) => {
+            event.preventDefault();
+            onContextLost?.();
+          },
+          { once: true },
+        );
       }}
     >
-      <Scene dna={dna} influence={influence} interactive={interactive} audioBands={audioBands} keyboardInput={keyboardInput} config={config} />
+      <Scene
+        dna={dna}
+        influence={influence}
+        interactive={interactive}
+        audioBands={audioBands}
+        keyboardInput={keyboardInput}
+        config={config}
+        biome={biome}
+        lifeState={lifeState}
+        showNearby={showNearby}
+      />
     </Canvas>
   );
 }
 
-function Scene({ dna, influence, interactive, audioBands, keyboardInput, config }: { dna: VektorDNA; influence: InfluenceState; interactive: boolean; audioBands?: React.RefObject<AudioBands>; keyboardInput?: React.RefObject<{ x: number; y: number; feed: boolean }>; config: (typeof qualityConfig)[QualityTier] }) {
+function Scene({
+  dna,
+  influence,
+  interactive,
+  audioBands,
+  keyboardInput,
+  config,
+  biome,
+  lifeState,
+  showNearby,
+}: {
+  dna: VektorDNA;
+  influence: InfluenceState;
+  interactive: boolean;
+  audioBands?: React.RefObject<AudioBands>;
+  keyboardInput?: React.RefObject<{ x: number; y: number; feed: boolean }>;
+  config: (typeof qualityConfig)[QualityTier];
+  biome?: BiomeType;
+  lifeState?: VektorState;
+  showNearby: boolean;
+}) {
   return (
     <>
       <ambientLight intensity={0.25} />
-      <pointLight position={[3, 4, 5]} color={dna.palette.primary} intensity={18} distance={14} />
+      <pointLight
+        position={[3, 4, 5]}
+        color={dna.visual.palette.primary}
+        intensity={18}
+        distance={14}
+      />
+      {biome && <BiomeEnvironment biome={biome} dna={dna} lowDetail={!config.post} />}
+      {biome && showNearby && <NearbySignalSilhouettes biome={biome} dna={dna} />}
       <CameraRig influence={influence} />
       <AudioInfluence influence={influence} audioBands={audioBands} />
       <KeyboardInfluence influence={influence} keyboardInput={keyboardInput} />
       {interactive && <InteractionPlane influence={influence} />}
-      <Organism dna={dna} influence={influence} particleCount={config.particles} membrane={config.membrane} />
+      <Organism
+        dna={dna}
+        influence={influence}
+        particleCount={config.particles}
+        membrane={config.membrane}
+        lifeState={lifeState}
+      />
       {config.post && (
         <EffectComposer multisampling={0}>
           <Bloom intensity={0.45} luminanceThreshold={0.82} luminanceSmoothing={0.35} mipmapBlur />
@@ -72,7 +172,13 @@ function Scene({ dna, influence, interactive, audioBands, keyboardInput, config 
   );
 }
 
-function KeyboardInfluence({ influence, keyboardInput }: { influence: InfluenceState; keyboardInput?: React.RefObject<{ x: number; y: number; feed: boolean }> }) {
+function KeyboardInfluence({
+  influence,
+  keyboardInput,
+}: {
+  influence: InfluenceState;
+  keyboardInput?: React.RefObject<{ x: number; y: number; feed: boolean }>;
+}) {
   useFrame((_, delta) => {
     const input = keyboardInput?.current;
     if (!input || (input.x === 0 && input.y === 0 && !input.feed)) return;
@@ -87,10 +193,25 @@ function InteractionPlane({ influence }: { influence: InfluenceState }) {
   const update = (event: ThreeEvent<PointerEvent>) => {
     influence.previousPointer.copy(influence.pointer);
     influence.pointer.copy(event.point);
-    influence.velocity.set(event.point.x - influence.previousPointer.x, event.point.y - influence.previousPointer.y).multiplyScalar(3.5);
+    influence.velocity
+      .set(event.point.x - influence.previousPointer.x, event.point.y - influence.previousPointer.y)
+      .multiplyScalar(3.5);
   };
   return (
-    <mesh position={[0, 0, -0.35]} onPointerMove={update} onPointerDown={(event) => { event.stopPropagation(); influence.pressed = true; update(event); (event.target as Element | null)?.setPointerCapture?.(event.pointerId); }} onPointerUp={(event) => { influence.pressed = false; (event.target as Element | null)?.releasePointerCapture?.(event.pointerId); }}>
+    <mesh
+      position={[0, 0, -0.35]}
+      onPointerMove={update}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        influence.pressed = true;
+        update(event);
+        (event.target as Element | null)?.setPointerCapture?.(event.pointerId);
+      }}
+      onPointerUp={(event) => {
+        influence.pressed = false;
+        (event.target as Element | null)?.releasePointerCapture?.(event.pointerId);
+      }}
+    >
       <planeGeometry args={[40, 40]} />
       <meshBasicMaterial visible={false} />
     </mesh>
@@ -100,14 +221,30 @@ function InteractionPlane({ influence }: { influence: InfluenceState }) {
 function CameraRig({ influence }: { influence: InfluenceState }) {
   const camera = useThree((state) => state.camera);
   useFrame((_, delta) => {
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, influence.pointer.x * 0.055, 3.5, delta);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, influence.pointer.y * 0.04, 3.5, delta);
+    camera.position.x = THREE.MathUtils.damp(
+      camera.position.x,
+      influence.pointer.x * 0.055,
+      3.5,
+      delta,
+    );
+    camera.position.y = THREE.MathUtils.damp(
+      camera.position.y,
+      influence.pointer.y * 0.04,
+      3.5,
+      delta,
+    );
     camera.lookAt(0, 0, 0);
   });
   return null;
 }
 
-function AudioInfluence({ influence, audioBands }: { influence: InfluenceState; audioBands?: React.RefObject<AudioBands> }) {
+function AudioInfluence({
+  influence,
+  audioBands,
+}: {
+  influence: InfluenceState;
+  audioBands?: React.RefObject<AudioBands>;
+}) {
   useFrame((_, delta) => {
     const bands = audioBands?.current;
     influence.bass = THREE.MathUtils.damp(influence.bass, bands?.bass ?? 0, 8, delta);
@@ -119,7 +256,11 @@ function AudioInfluence({ influence, audioBands }: { influence: InfluenceState; 
 
 function CanvasFallback() {
   return (
-    <div className="canvas-fallback" role="img" aria-label="Static illustration of a luminous Vektor organism">
+    <div
+      className="canvas-fallback"
+      role="img"
+      aria-label="Static illustration of a luminous Vektor organism"
+    >
       <span />
       <p>WebGL is unavailable. Your DNA can still be created, named, and shared.</p>
     </div>
