@@ -9,7 +9,11 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:3000`. No external service is required for the local creation, publish, share, explore, and remix flows.
+Open `http://localhost:3000`. No external service is required for local development: without `DATABASE_URL`, the API uses its process-local fallback. To verify durable state and memories, configure PostgreSQL and apply the checked-in Drizzle migrations before starting the app.
+
+```bash
+pnpm db:migrate
+```
 
 ## Verify
 
@@ -28,7 +32,7 @@ pnpm test:e2e --project=chromium
 - Zustand for the recoverable lab draft; TanStack Query for public server state; URL state for Explore filters.
 - Zod for strict versioned DNA and server input validation.
 - Deterministic seeded mutation and fusion with recorded ancestry.
-- Drizzle PostgreSQL schema for users, sessions, profiles, Vektors, parents, reactions, and reports.
+- Drizzle PostgreSQL runtime persistence for Vektors, their single active state, memories, biome travel, reactions and reports; the release transaction writes the Vektor, state and first memories atomically.
 - Playwright coverage for rendered canvas pixels, anonymous creation, persistence recovery, network failure, share, remix, mobile, reduced motion, and console errors.
 
 The implementation plan is in [`docs/implementation-plan.md`](docs/implementation-plan.md), and the critical flow specification is in [`specs/vektorix.plan.md`](specs/vektorix.plan.md).
@@ -37,4 +41,4 @@ A complete Turkish product and architecture explanation is available in [`docs/v
 
 ## Deployment boundary
 
-The checked-in local repository is intentionally self-contained. Its API uses a process-local repository and deterministic encoded share URLs, so records survive client navigation but not a server restart. Before a multi-instance deployment, connect the existing Drizzle schema to PostgreSQL, configure Better Auth with a real email or social provider, and upload preview files to R2/S3 instead of storing their data URLs in process memory. Copy `.env.example` and supply deployment-owned credentials; never commit them.
+The checked-in local repository remains self-contained through a process-local development fallback. With `DATABASE_URL`, the API uses PostgreSQL and backfills missing lifecycle state and release memories for legacy records. Before a multi-instance deployment, apply the Drizzle migrations, configure Better Auth with a real email or social provider, and upload preview files to R2/S3 instead of storing large preview data URLs in PostgreSQL. Copy `.env.example` and supply deployment-owned credentials; never commit them.

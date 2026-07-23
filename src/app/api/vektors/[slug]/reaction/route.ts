@@ -6,6 +6,6 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
   const { slug } = await context.params;
   const session = request.headers.get("x-vektorix-session") ?? "anonymous";
   if (!allowRequest(`reaction:${session}`, 30)) return NextResponse.json({ error: "Slow down." }, { status: 429 });
-  const result = vektorRepository.toggleReaction(slug, session);
+  const result = await vektorRepository.toggleReaction(slug, session);
   return result ? NextResponse.json(result) : NextResponse.json({ error: "Vektor not found." }, { status: 404 });
 }

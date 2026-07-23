@@ -15,7 +15,7 @@ type Props = {
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params;
   const query = await searchParams;
-  const record = vektorRepository.get(slug) ?? getSampleVektor(slug);
+  const record = (await vektorRepository.get(slug)) ?? getSampleVektor(slug);
   const name = query.name ? decodeURIComponent(query.name) : (record?.name ?? "Unknown Vektor");
   const description =
     record?.description ?? "A living deterministic organism shaped in the Vektorix lab.";
@@ -37,7 +37,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 export default async function VektorPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const query = await searchParams;
-  let record = vektorRepository.get(slug) ?? getSampleVektor(slug);
+  let record = (await vektorRepository.get(slug)) ?? getSampleVektor(slug);
   if (!record && query.data) {
     try {
       const dna = decodeDNA(query.data);

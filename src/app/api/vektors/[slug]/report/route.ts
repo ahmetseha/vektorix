@@ -14,5 +14,5 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
   } catch {
     return NextResponse.json({ error: "Invalid report." }, { status: 400 });
   }
-  return vektorRepository.report(slug, session) ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Vektor not found." }, { status: 404 });
+  return (await vektorRepository.report(slug, session)) ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Vektor not found." }, { status: 404 });
 }

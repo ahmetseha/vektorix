@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default async function VektorMemoriesPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const query = await searchParams;
-  let record = vektorRepository.get(slug) ?? getSampleVektor(slug);
+  let record = (await vektorRepository.get(slug)) ?? getSampleVektor(slug);
   if (!record && query.data) {
     try {
       record = createEphemeralVektorRecord({

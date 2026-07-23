@@ -11,11 +11,15 @@ export const memoryService = {
   append(target: VektorMemory[], generated: GeneratedMemory[]): VektorMemory[] {
     const memories = generated.map((memory) => this.materialize(memory));
     target.push(...memories);
+    this.sort(target);
+    return memories;
+  },
+  sort(target: VektorMemory[]) {
     target.sort(
       (left, right) =>
         right.createdAt.localeCompare(left.createdAt) ||
         right.importance - left.importance,
     );
-    return memories;
+    return target;
   },
 };

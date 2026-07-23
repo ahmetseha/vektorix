@@ -26,7 +26,7 @@ export default async function BiomeFieldPage({ params, searchParams }: Props) {
   const biome = parsed.data as BiomeType;
   const query = await searchParams;
   let record = query.slug
-    ? (vektorRepository.get(query.slug) ?? getSampleVektor(query.slug))
+    ? ((await vektorRepository.get(query.slug)) ?? getSampleVektor(query.slug))
     : undefined;
 
   if (!record && query.data) {

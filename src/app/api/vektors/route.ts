@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { publishVektorSchema } from "@/features/lab/schemas/dna";
 import { parseVektorDNA } from "@/features/lab/engine/dna";
 import { allowRequest } from "@/server/rate-limit";
 import { vektorRepository } from "@/server/services/vektor-repository";
 
 export async function GET() {
-  return NextResponse.json({ items: vektorRepository.list() });
+  return NextResponse.json({ items: await vektorRepository.list() });
 }
 
 export async function POST(request: Request) {
@@ -28,8 +29,14 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    return NextResponse.json(vektorRepository.create(input), { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "The Vektor data is invalid." }, { status: 400 });
+    return NextResponse.json(await vektorRepository.create(input), { status: 201 });
+  } catch (error) {
+    if (error instanceof ZodError || error instanceof SyntaxError) {
+      return NextResponse.json({ error: "The Vektor data is invalid." }, { status: 400 });
+    }
+    return NextResponse.json(
+      { error: "The field could not persist this Vektor." },
+      { status: 503 },
+    );
   }
 }

@@ -16,7 +16,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid biome." }, { status: 400 });
   }
-  const record = vektorRepository.travel(slug, parsed.data.biome);
+  const record = await vektorRepository.travel(slug, parsed.data.biome);
   if (!record) {
     return NextResponse.json({ error: "Vektor not found." }, { status: 404 });
   }
