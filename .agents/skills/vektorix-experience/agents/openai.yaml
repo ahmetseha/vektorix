@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vektorix Experience"
+  short_description: "Protect procedural product quality"
+  default_prompt: "Use $vektorix-experience to build or review Vektorix while preserving deterministic DNA, performance, accessibility, and its non-AI direction."
