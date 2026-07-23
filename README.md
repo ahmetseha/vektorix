@@ -33,6 +33,8 @@ pnpm test:e2e --project=chromium
 
 The implementation plan is in [`docs/implementation-plan.md`](docs/implementation-plan.md), and the critical flow specification is in [`specs/vektorix.plan.md`](specs/vektorix.plan.md).
 
+A complete Turkish product and architecture explanation is available in [`docs/vektorix-nasil-calisir.md`](docs/vektorix-nasil-calisir.md).
+
 ## Deployment boundary
 
 The checked-in local repository is intentionally self-contained. Its API uses a process-local repository and deterministic encoded share URLs, so records survive client navigation but not a server restart. Before a multi-instance deployment, connect the existing Drizzle schema to PostgreSQL, configure Better Auth with a real email or social provider, and upload preview files to R2/S3 instead of storing their data URLs in process memory. Copy `.env.example` and supply deployment-owned credentials; never commit them.
